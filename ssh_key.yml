@@ -1,0 +1,22 @@
+---
+  - name: ssh_key.yml
+    host: all
+    become: yes
+    task:
+      - name: Add new user
+        user:
+          name: deepakthimo
+          state: present
+      - name: Ensure .ssh directory exists
+        file:
+          path: /home/deepakthimo/.ssh
+          state: directory
+          mode: u=wrx, g=r, o=r
+          owner: deepakthimo
+      - name: Deploy SSH key for new user
+        authorized_key:
+          user: deepakthimo
+          key: {{ 'file', lookup('/home/tallbrat/.ssh/id_rsa.pub') }}
+          state: present
+...
+
