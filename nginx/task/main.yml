@@ -1,0 +1,32 @@
+---
+- name: Download the nginx signing key
+  become: true
+  get_url:
+    url: wget http://nginx.org/keys/nginx_signing.key
+    dest: "/tmp/nginx_signing.key"
+- name: Add the key
+  apt_key:
+    file: "/tmp/nginx_signing.key"
+    state: present
+- name: Adding nginx repository to sources.list
+  blockinfile:
+    path: /etc/apt/sources.list
+    block: deb http://nginx.org/packages/ubuntu focal nginx
+           deb-src http://nginx.org/packages/ubuntu focal nginx
+- name: apt update_cache
+  apt:
+    update_cache: yes
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+- name: Start nginx service
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+- name: Copy files to the nginx folder
+  src: /deepak/project/web/
+  dest: /var/www
+  owner: root
+  
